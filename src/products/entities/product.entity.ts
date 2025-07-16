@@ -55,6 +55,8 @@ export class Product {
   // Imagenes
   @OneToMany(() => ProductImage, (productImage) => productImage.product, {
     cascade: true,
+    // Cada vez que se usa un metodo find automaticamente me va a traer las imagenes que seria la tabla relacionada
+    eager: true,
   })
   images?: ProductImage[];
 
