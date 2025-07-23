@@ -11,6 +11,7 @@ export class ProductImage {
 
   // Referencia a un producto
   @ManyToOne(() => Product, (product) => product.images, {
+    /* Al borrarse un producto, en cascada se eliminan las imagenes asociadas al producto */
     onDelete: 'CASCADE',
   })
   product: Product;
