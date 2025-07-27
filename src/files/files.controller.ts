@@ -8,15 +8,20 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { FilesService } from './files.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { fileFilter, fileNamer } from './helpers';
 import { Response } from 'express';
+import { diskStorage } from 'multer';
+import { FilesService } from './files.service';
+import { fileFilter, fileNamer } from './helpers';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('files')
 export class FilesController {
-  constructor(private readonly filesService: FilesService) {}
+  constructor(
+    private readonly filesService: FilesService,
+    // Con esto tengo acceso a las variables de entorno
+    private readonly configService: ConfigService,
+  ) {}
 
   @Get('product/:imageName')
   findProductImage(
@@ -48,7 +53,10 @@ export class FilesController {
       throw new BadRequestException('Make sure that the file is an image');
     }
 
-    const secureUrl = `${file.filename}`;
+    // const secureUrl = `${file.filename}`;
+    const secureUrl = `${this.configService.get('HOST_API')}/files/products/${
+      file.filename
+    }`;
 
     return {
       secureUrl,
