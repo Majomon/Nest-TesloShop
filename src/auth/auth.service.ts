@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -18,7 +22,17 @@ export class AuthService {
 
       return user;
     } catch (error) {
-      console.log(error);
+      this.handleDBError(error);
     }
+  }
+
+  private handleDBError(error: any): never {
+    if (error.code === '23505') {
+      throw new BadRequestException(error.detail || 'El usuario ya existe');
+    }
+    console.log(error);
+    throw new InternalServerErrorException(
+      'Error al crear el usuario, consulte los logs',
+    );
   }
 }
