@@ -9,6 +9,7 @@ import { CommonModule } from './common/common.module';
 import { FilesModule } from './files/files.module';
 import { ProductsModule } from './products/products.module';
 import { SeedModule } from './seed/seed.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -23,15 +24,16 @@ import { SeedModule } from './seed/seed.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    /* 
+
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
- */
+
     SeedModule,
     ProductsModule,
     CommonModule,
     FilesModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
