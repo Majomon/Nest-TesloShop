@@ -10,7 +10,9 @@ export class User {
   })
   email: string;
 
-  @Column('text')
+  @Column('text', {
+    select: false, // Do not return password by default
+  })
   password: string;
 
   @Column('text', {
