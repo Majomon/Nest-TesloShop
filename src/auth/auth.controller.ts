@@ -3,17 +3,17 @@ import {
   Controller,
   Get,
   Post,
-  SetMetadata,
-  UseGuards,
+  UseGuards
 } from '@nestjs/common';
 
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto } from './dto';
-import { AuthGuard } from '@nestjs/passport';
 
+import { Auth, GetUser, RawHeaders, RoleProtected } from './decorators';
 import { User } from './entities/user.entity';
-import { GetUser, RawHeaders } from './decorators';
 import { UserRoleGuard } from './guards/user-role.guard';
+import { ValidRoles } from './interfaces';
 
 @Controller('auth')
 export class AuthController {
@@ -39,10 +39,17 @@ export class AuthController {
     return { ok: true, message: 'Ruta privada', user, userEmail, rawHeaders };
   }
 
+  // @SetMetadata('roles', ['admin', 'super-user'])
   @Get('private2')
-  @SetMetadata('roles', ['admin', 'super-user'])
+  @RoleProtected(ValidRoles.superUser, ValidRoles.user)
   @UseGuards(AuthGuard(), UserRoleGuard)
   privateRoute2(@GetUser() user: User) {
     return { ok: true, message: 'Ruta privada 2', user };
+  }
+
+  @Get('private3')
+  @Auth(ValidRoles.admin)
+  privateRoute3(@GetUser() user: User) {
+    return { ok: true, message: 'Ruta privada 3', user };
   }
 }
