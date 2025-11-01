@@ -1,15 +1,17 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, } from '@nestjs/common';
+
+import { ValidRoles } from '../auth/interfaces';
+import { Auth } from '../auth/decorators';
+
 import { SeedService } from './seed.service';
-import { Auth } from 'src/auth/decorators';
-import { ValidRoles } from 'src/auth/interfaces';
 
 @Controller('seed')
 export class SeedController {
   constructor(private readonly seedService: SeedService) {}
 
   @Get()
-  //@Auth(ValidRoles.admin)
-  async executeSeed() {
-    return this.seedService.runSeed();
+  // @Auth( ValidRoles.admin )
+  executeSeed() {
+    return this.seedService.runSeed()
   }
 }

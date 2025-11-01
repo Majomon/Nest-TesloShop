@@ -8,33 +8,36 @@ import { User } from '../entities/user.entity';
 import { JwtPayload } from '../interfaces/jwt-payload.interface';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-    configService: ConfigService,
-  ) {
-    super({
-      secretOrKey:
-        configService.get<string>('JWT_SECRET', { infer: true }) ||
-        'default_secret',
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    });
-  }
+export class JwtStrategy extends PassportStrategy( Strategy ) {
 
-  async validate(payload: JwtPayload): Promise<User> {
-    const { id } = payload;
+    constructor(
+        @InjectRepository( User )
+        private readonly userRepository: Repository<User>,
 
-    const user = await this.userRepository.findOneBy({ id });
+        configService: ConfigService
+    ) {
 
-    if (!user) {
-      throw new UnauthorizedException('Token no válido - usuario no existe');
+        super({
+            secretOrKey: configService.get('JWT_SECRET'),
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        });
     }
 
-    if (!user.isActive) {
-      throw new UnauthorizedException('Token no válido - usuario inactivo');
+
+    async validate( payload: JwtPayload ): Promise<User> {
+        
+        const { id } = payload;
+
+        const user = await this.userRepository.findOneBy({ id });
+
+        if ( !user ) 
+            throw new UnauthorizedException('Token not valid')
+            
+        if ( !user.isActive ) 
+            throw new UnauthorizedException('User is inactive, talk with an admin');
+        
+
+        return user;
     }
 
-    return user;
-  }
 }

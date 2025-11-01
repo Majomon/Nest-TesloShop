@@ -1,86 +1,92 @@
-// Una entidad es una representacion de un objeto en la base de datos - Es una tabla
-
-import {
-  BeforeInsert,
-  BeforeUpdate,
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ProductImage } from './';
+import { User } from '../../auth/entities/user.entity';
 
-@Entity({
-  name: 'products',
-})
+@Entity({ name: 'products' })
 export class Product {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
 
-  @Column('text', {
-    unique: true,
-  })
-  title: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
-  @Column('float', {
-    default: 0,
-  })
-  price: number;
+    @Column('text', {
+        unique: true,
+    })
+    title: string;
 
-  @Column({ type: 'text', nullable: true })
-  description: string;
+    @Column('float',{
+        default: 0
+    })
+    price: number;
 
-  @Column('text', {
-    unique: true,
-  })
-  slug: string;
+    @Column({
+        type: 'text',
+        nullable: true
+    })
+    description: string;
 
-  @Column('int', {
-    default: 0,
-  })
-  stock: number;
+    @Column('text', {
+        unique: true
+    })
+    slug: string;
 
-  @Column('text', {
-    array: true,
-  })
-  sizes: string[];
+    @Column('int', {
+        default: 0
+    })
+    stock: number;
 
-  @Column('text')
-  gender: string;
+    @Column('text',{
+        array: true
+    })
+    sizes: string[];
 
-  @Column('text', {
-    array: true,
-    default: [],
-  })
-  tags: string[];
+    @Column('text')
+    gender: string;
 
-  // Imagenes
-  @OneToMany(() => ProductImage, (productImage) => productImage.product, {
-    cascade: true,
-    // Cada vez que se usa un metodo find automaticamente me va a traer las imagenes que seria la tabla relacionada
-    eager: true,
-  })
-  images?: ProductImage[];
 
-  // Para la hora de crear
-  @BeforeInsert()
-  checkSlugInsert() {
-    if (!this.slug) {
-      this.slug = this.title;
+    @Column('text', {
+        array: true,
+        default: []
+    })
+    tags: string[];
+
+    // images
+    @OneToMany(
+        () => ProductImage,
+        (productImage) => productImage.product,
+        { cascade: true, eager: true }
+    )
+    images?: ProductImage[];
+
+
+    @ManyToOne(
+        () => User,
+        ( user ) => user.product,
+        { eager: true }
+    )
+    user: User
+
+
+    @BeforeInsert()
+    checkSlugInsert() {
+
+        if ( !this.slug ) {
+            this.slug = this.title;
+        }
+
+        this.slug = this.slug
+            .toLowerCase()
+            .replaceAll(' ','_')
+            .replaceAll("'",'')
+
     }
 
-    this.slug = this.slug
-      .toLowerCase()
-      .replaceAll(' ', '_')
-      .replaceAll("'", '');
-  }
+    @BeforeUpdate()
+    checkSlugUpdate() {
+        this.slug = this.slug
+            .toLowerCase()
+            .replaceAll(' ','_')
+            .replaceAll("'",'')
+    }
 
-  // Para la hora de actualizar
-  @BeforeUpdate()
-  checkSlugUpdate() {
-    this.slug = this.slug
-      .toLowerCase()
-      .replaceAll(' ', '_')
-      .replaceAll("'", '');
-  }
+
 }
